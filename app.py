@@ -118,6 +118,48 @@ def ensure_inbox():
         except Exception as e:
             st.error(f"Erreur création dossier inbox: {e}")
 
+import requests
+
+# ... (Configuration existante)
+
+# --- TELEGRAM CONFIG ---
+TELEGRAM_TOKEN = "8203517157:AAEYkIpm9zkhogn3fmsZvd6gT76aZ4TsFCw"
+TELEGRAM_CHAT_ID = "-5279762957" # ID du Groupe KAIROS 1/2
+
+def send_telegram_notification(data, filename, filepath):
+    """Envoie une notification et le fichier JSON via Telegram"""
+    try:
+        # 1. Message Résumé
+        summary = (
+            f"🚀 <b>NOUVEAU LEAD KAIROS (WEB)</b>\n\n"
+            f"👤 <b>Nom:</b> {data.get('nom')}\n"
+            f"📱 <b>TikTok:</b> {data.get('tiktok')}\n"
+            f"✈️ <b>Telegram:</b> {data.get('telegram')}\n"
+            f"🌍 <b>Pays:</b> {data.get('pays')}\n\n"
+            f"🤖 <b>Robot:</b> {data.get('robot')}\n"
+            f"💰 <b>Capital:</b> {data.get('capital')}\n"
+            f"💎 <b>Offre:</b> {data.get('offre')}\n"
+            f"🛡️ <b>Sérénité:</b> {data.get('serenite', 'Non renseigné')}\n\n"
+            f"📂 <b>Fichier joint:</b> <code>{filename}</code>"
+        )
+        
+        # Envoi Message
+        url_msg = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
+        payload_msg = {"chat_id": TELEGRAM_CHAT_ID, "text": summary, "parse_mode": "HTML"}
+        requests.post(url_msg, data=payload_msg)
+
+        # 2. Envoi Fichier JSON
+        url_doc = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendDocument"
+        with open(filepath, 'rb') as f:
+            files = {'document': f}
+            payload_doc = {"chat_id": TELEGRAM_CHAT_ID, "caption": f"Fichier Config: {filename}"}
+            requests.post(url_doc, data=payload_doc, files=files)
+            
+        return True
+    except Exception as e:
+        print(f"Erreur Telegram: {e}")
+        return False
+
 def save_lead_json(data):
     """Sauvegarde le lead en JSON compatible CRM dans le dossier inbox"""
     ensure_inbox()
@@ -163,6 +205,11 @@ def save_lead_json(data):
     try:
         with open(filepath, 'w', encoding='utf-8') as f:
             json.dump(export_data, f, indent=2, ensure_ascii=False)
+        
+        # --- ENVOI TELEGRAM ---
+        # Maintenant que le fichier est créé, on l'envoie au groupe
+        send_telegram_notification(data, filename, filepath)
+        
         return True, filename
     except Exception as e:
         return False, str(e)

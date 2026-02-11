@@ -226,7 +226,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.title("🏛️ KAIROS 4.0")
-st.caption("Assistant d'Architecture Financière (Version Locale)")
+st.caption("Assistant d'Architecture Financière")
 
 # Sidebar Info
 st.sidebar.header("📚 Documentation Légale")
@@ -235,7 +235,7 @@ st.sidebar.link_button("📝 Licence / Attestation", LICENSE_DOC_URL)
 st.sidebar.markdown("---")
 st.sidebar.link_button("🆘 Contacter le Support", CONTACT_SUPPORT)
 st.sidebar.markdown("---")
-st.sidebar.info("Ceci est une version locale de l'assistant KAIROS.")
+st.sidebar.info("Application Client KAIROS 4.0 - v4.1 (Stable)")
 
 # --- ETAPE 1: PROFIL ---
 st.header("1. Profil & Identité")
